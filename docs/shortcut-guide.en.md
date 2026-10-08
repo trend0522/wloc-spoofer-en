@@ -50,7 +50,7 @@ cd worker
 npx wrangler deploy
 ```
 
-Or in the CF Dashboard → Workers → create a new Worker → paste `wloc-worker.js` → deploy.
+Or deploy the full worker: `cd worker && npx wrangler deploy` (the dashboard-paste single file no longer exists; it lacked /api/parse).
 
 No KV, no database, no environment variables required.
 
