@@ -38,5 +38,20 @@ export default {
   paste_first: 'Please paste a map link or coordinates', parse_failed: 'Could not parse coordinates, please check the link format',
   parsed: 'Parsed: {}, {}',
   enter_place: 'Please enter a place name', searching: 'Searching...',
-  not_found: 'Not found: {}', search_failed: 'Search failed'
+  not_found: 'Not found: {}', search_failed: 'Search failed',
+  layer_wgs84: 'WGS84',
+  layer_menu: 'Map layer',
+  group_base: 'Basemaps', group_china: 'China',
+  layerdesc_satellite: 'Global satellite imagery (WGS84)',
+  layerdesc_wgs84: 'Street map, no coordinate offset',
+  layerdesc_voyager: 'Colorful street map',
+  layerdesc_standard: 'OpenStreetMap data',
+  layerdesc_dark: 'Dark basemap, easier at night',
+  layerdesc_amap: 'Amap imagery (GCJ-02 offset in the mainland)',
+  retry: 'Retry',
+  coords_hint_short: 'Tap the map to pick',
+  query_wait: 'Waiting for the device to respond...',
+  theme_label: 'Theme',
+  theme_auto: 'Auto', theme_light: 'Light', theme_dark: 'Dark',
+  theme_announce: 'Theme: {}'
 };
