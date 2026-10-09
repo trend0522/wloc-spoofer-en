@@ -1,3 +1,10 @@
+import EN from "./i18n.en.js";
+import ZHTW from "./i18n.zh-tw.js";
+
+// Embed dicts as JSON, escaping every `<` as \u003c so a `</script>` inside a
+// dict string can never terminate the inline block (browser JS decodes it back to `<`).
+const embed = o => JSON.stringify(o).replace(/</g, "\\u003c");
+
 export function getPageHtml() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -5,7 +12,7 @@ export function getPageHtml() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>WLOC Location Spoofer</title>
+<title>${EN.title}</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="WLOC">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
@@ -76,7 +83,7 @@ body { font-family:-apple-system,system-ui,"SF Pro","Helvetica Neue",sans-serif;
 <div style="position:relative">
 <div id="map"></div>
 <div class="lang-switch">
-  <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
+  <button class="lang-btn" data-lang="zh-tw" onclick="setLang('zh-tw')">中</button>
   <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
 </div>
 <div class="layer-switch">
@@ -156,105 +163,34 @@ let activeLon = null, activeLat = null, activeAcc = null, activeStatus = 'queryi
 let savedLon = null, savedLat = null, savedTimeStr = '';
 let saveResetTimer = null;
 
-/* ---- i18n ---- */
-const I18N = {
-  zh: {
-    title: 'WLOC 虚拟定位',
-    layer_satellite: '卫星', layer_amap: '高德', layer_color: '彩色', layer_standard: '标准', layer_dark: '暗色',
-    err_html: '<b>模块未生效</b>请检查以下配置：<br>1. 已安装并启用 WLOC 定位模块<br>2. MITM 已开启且信任证书<br>3. MITM 主机名包含 gs-loc.apple.com<br>4. 当前网络已走代理',
-    choose_title: '选择目标位置',
-    coords_hint: '点击地图或使用下方工具选择位置',
-    save: '储存到设备', add_fav: '收藏位置', locate: '当前位置',
-    fav_title: '收藏的位置', clear_all: '清空全部',
-    active_title: '当前生效坐标', active_label: '设备持久化数据 (wloc_settings)',
-    refresh: '刷新', clear_data: '清除数据',
-    paste_title: '粘贴地图链接', paste_ph: 'Apple/Google/高德地图链接 或 经纬度', parse: '解析',
-    paste_hint: '支持 Apple Maps · Google Maps · 高德 · 百度 · 坐标文本',
-    search_title: '搜索地点', search_ph: '输入地名（如: 上海外滩）', search: '搜索',
-    status_hint: '选好位置后点击「储存到设备」写入代理工具',
-    modal_title: '收藏此位置', modal_ph: '输入备注名称（如: 公司、家）', cancel: '取消', save_short: '保存',
-    lon: '经度', lat: '纬度', acc: '精度',
-    querying: '查询中...', no_saved: '无已保存的坐标', query_failed: '查询失败 (需要代理模块支持)', cleared: '已清除',
-    fav_empty: '暂无收藏，选好位置后点击「收藏位置」',
-    active_now: '✓ 当前生效', del: '删除',
-    pick_first: '请先在地图上选择一个位置',
-    enter_label: '请输入备注名称',
-    added: function(n){ return '已收藏: ' + n; },
-    deleted: function(n){ return '已删除: ' + n; },
-    clear_fav_confirm: '确定清空所有收藏？', all_cleared: '已清空所有收藏',
-    clear_confirm: '确定清除设备上已保存的坐标？清除后将使用模块默认参数或停止修改定位。',
-    dev_cleared: '已清除设备坐标',
-    clear_failed: function(e){ return '清除失败: ' + e; },
-    clear_failed_cfg: '清除失败 - 请检查模块配置',
-    saving: '储存中...', saved: '✓ 已储存',
-    written: function(lo, la, ts){ return '✓ 已写入: ' + lo.toFixed(6) + ', ' + la.toFixed(6) + ' · ' + ts; },
-    saved_toast: '✓ 坐标已写入设备，下次定位生效',
-    save_failed: '✗ 储存失败 - 请检查模块配置', write_failed: '写入失败',
-    no_geo: '浏览器不支持定位', getting_loc: '获取位置中...', got_loc: '已获取当前位置',
-    loc_failed: function(m){ return '定位失败: ' + m; },
-    paste_first: '请粘贴地图链接或坐标', parse_failed: '无法解析坐标，请检查链接格式',
-    parsed: function(lo, la){ return '已解析: ' + lo.toFixed(4) + ', ' + la.toFixed(4); },
-    enter_place: '请输入地名', searching: '搜索中...',
-    not_found: function(q){ return '未找到: ' + q; }, search_failed: '搜索失败'
-  },
-  en: {
-    title: 'WLOC Location Spoofer',
-    layer_satellite: 'Satellite', layer_amap: 'Amap', layer_color: 'Color', layer_standard: 'Standard', layer_dark: 'Dark',
-    err_html: '<b>Module not active</b>Please check the following:<br>1. The WLOC location module is installed and enabled<br>2. MITM is on and the certificate is trusted<br>3. The MITM hostname list includes gs-loc.apple.com<br>4. The current network is routed through the proxy',
-    choose_title: 'Choose target location',
-    coords_hint: 'Tap the map or use the tools below to pick a location',
-    save: 'Save to Device', add_fav: 'Add Favorite', locate: 'Current Location',
-    fav_title: 'Favorites', clear_all: 'Clear All',
-    active_title: 'Active coordinates', active_label: 'Device persisted data (wloc_settings)',
-    refresh: 'Refresh', clear_data: 'Clear Data',
-    paste_title: 'Paste map link', paste_ph: 'Apple / Google / Amap map link or coordinates', parse: 'Parse',
-    paste_hint: 'Supports Apple Maps · Google Maps · Amap · Baidu · coordinate text',
-    search_title: 'Search place', search_ph: 'Enter a place name (e.g. The Bund, Shanghai)', search: 'Search',
-    status_hint: 'Pick a location, then tap "Save to Device" to write it to your proxy tool',
-    modal_title: 'Add this location to favorites', modal_ph: 'Enter a label (e.g. Office, Home)', cancel: 'Cancel', save_short: 'Save',
-    lon: 'Lon', lat: 'Lat', acc: 'Accuracy',
-    querying: 'Querying...', no_saved: 'No saved coordinates', query_failed: 'Query failed (requires the proxy module)', cleared: 'Cleared',
-    fav_empty: 'No favorites yet. Pick a location and tap "Add Favorite".',
-    active_now: '✓ Active now', del: 'Delete',
-    pick_first: 'Please pick a location on the map first',
-    enter_label: 'Please enter a label',
-    added: function(n){ return 'Added: ' + n; },
-    deleted: function(n){ return 'Deleted: ' + n; },
-    clear_fav_confirm: 'Clear all favorites?', all_cleared: 'All favorites cleared',
-    clear_confirm: 'Clear the coordinates saved on the device? After clearing, the module default parameters will be used or location spoofing will stop.',
-    dev_cleared: 'Device coordinates cleared',
-    clear_failed: function(e){ return 'Clear failed: ' + e; },
-    clear_failed_cfg: 'Clear failed - please check the module configuration',
-    saving: 'Saving...', saved: '✓ Saved',
-    written: function(lo, la, ts){ return '✓ Written: ' + lo.toFixed(6) + ', ' + la.toFixed(6) + ' · ' + ts; },
-    saved_toast: '✓ Coordinates written to device, effective on next location fix',
-    save_failed: '✗ Save failed - please check the module configuration', write_failed: 'Write failed',
-    no_geo: 'Browser does not support geolocation', getting_loc: 'Getting location...', got_loc: 'Current location acquired',
-    loc_failed: function(m){ return 'Location failed: ' + m; },
-    paste_first: 'Please paste a map link or coordinates', parse_failed: 'Could not parse coordinates, please check the link format',
-    parsed: function(lo, la){ return 'Parsed: ' + lo.toFixed(4) + ', ' + la.toFixed(4); },
-    enter_place: 'Please enter a place name', searching: 'Searching...',
-    not_found: function(q){ return 'Not found: ' + q; }, search_failed: 'Search failed'
-  }
-};
+/* ---- i18n: dictionaries live in worker/src/i18n.en.js + i18n.zh-tw.js, embedded below as JSON ---- */
+const I18N = ${embed(EN)};
+const I18N_ZH_TW = ${embed(ZHTW)};
 
 function detectLang() {
   try {
     const saved = localStorage.getItem(LANG_KEY);
-    if (saved === 'zh' || saved === 'en') return saved;
+    if (saved === 'zh-tw' || saved === 'en') return saved;
   } catch(e) {}
-  return 'zh'; // default to Chinese; tap EN to switch (remembered per browser)
+  // Default follows navigator.language: zh* -> Traditional Chinese, everything else -> English.
+  const n = (navigator.language || 'en').toLowerCase();
+  return n.indexOf('zh') === 0 ? 'zh-tw' : 'en';
 }
 let lang = detectLang();
 
 function t(key) {
-  const v = I18N[lang][key];
-  if (typeof v === 'function') return v.apply(null, Array.prototype.slice.call(arguments, 1));
-  return v === undefined ? key : v;
+  let v = (lang === 'zh-tw' ? I18N_ZH_TW : I18N)[key];
+  if (v === undefined) v = I18N[key];
+  if (v === undefined) return key;
+  const args = Array.prototype.slice.call(arguments, 1);
+  return String(v).replace(/\\{\\}/g, () => {
+    const a = args.shift();
+    return typeof a === 'number' ? a.toFixed(6) : String(a);
+  });
 }
 
 function applyI18n() {
-  document.documentElement.lang = (lang === 'zh' ? 'zh-CN' : 'en');
+  document.documentElement.lang = (lang === 'zh-tw' ? 'zh-TW' : 'en');
   document.title = t('title');
   document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
   document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
@@ -531,7 +467,7 @@ function parseUrl() {
   const result = parseMapUrl(input);
   if (!result) { toast(t('parse_failed'), 3000); return; }
   moveTo(result.lat, result.lon, 15);
-  toast(t('parsed', result.lon, result.lat));
+  toast(t('parsed', result.lon.toFixed(4), result.lat.toFixed(4)));
 }
 
 async function searchPlace() {
