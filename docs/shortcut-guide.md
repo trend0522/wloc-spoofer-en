@@ -50,7 +50,7 @@ cd worker
 npx wrangler deploy
 ```
 
-或在 CF Dashboard → Workers → 新建 Worker → 粘贴 `wloc-worker.js` → 部署。
+或在 worker 目录执行 `npx wrangler deploy` 部署完整 Worker（旧的单文件粘贴版缺少 /api/parse，已移除）。
 
 无需 KV、数据库或环境变量。
 

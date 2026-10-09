@@ -1,6 +1,7 @@
 node_modules/
-src/
-package.json
+/src/
+/package.json
+/package-lock.json
 !worker/package-lock.json
-rollup.config.js
+/rollup.config.js
 .DS_Store
