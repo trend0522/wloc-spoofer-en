@@ -38,5 +38,20 @@ export default {
   paste_first: '請貼上地圖連結或座標', parse_failed: '無法解析座標，請檢查連結格式',
   parsed: '已解析：{}, {}',
   enter_place: '請輸入地名', searching: '搜尋中...',
-  not_found: '未找到：{}', search_failed: '搜尋失敗'
+  not_found: '未找到：{}', search_failed: '搜尋失敗',
+  layer_wgs84: 'WGS84',
+  layer_menu: '地圖圖層',
+  group_base: '底圖', group_china: '中國地圖',
+  layerdesc_satellite: '全球衛星影像（WGS84）',
+  layerdesc_wgs84: '街道圖，座標未偏移',
+  layerdesc_voyager: '彩色街道圖',
+  layerdesc_standard: '開放街道圖（OSM）資料',
+  layerdesc_dark: '深色底圖，夜間較不刺眼',
+  layerdesc_amap: '高德圖資（中國大陸採 GCJ-02 偏移）',
+  retry: '重試',
+  coords_hint_short: '點地圖選位置',
+  query_wait: '正在等待裝置回應...',
+  theme_label: '主題',
+  theme_auto: '自動', theme_light: '淺色', theme_dark: '深色',
+  theme_announce: '主題：{}'
 };
